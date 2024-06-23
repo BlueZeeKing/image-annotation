@@ -8,7 +8,7 @@ use tower_http::services::ServeDir;
 use tracing::info;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
-const ADDR: &str = "0.0.0.0:3000";
+const ADDR: &str = "127.0.0.1:3000";
 
 #[tokio::main]
 async fn main() {
