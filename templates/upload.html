@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+/014   package.json
+
+{% block body %}
+<div class="p-2">
+    <h1 class="pb-4 text-xl">Upload Images</h1>
+    <form action="/api/upload_file" method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/png, image/jpeg" multiple class="pb-2 file:bg-blue-500 file:rounded file:px-6 file:p-2 file:text-white file:shadow file:hover:bg-blue-400 file:active:scale-95 file:active:shadow-sm file:transition file:duration-100 file:text-md file:border-none file:cursor-pointer">
+        <br>
+        <input type="submit" class="bg-blue-500 rounded px-6 p-2 text-white shadow hover:bg-blue-400 active:scale-95 active:shadow-sm transition duration-100 text-md cursor-pointer">
+    </form>
+</div>
+{% endblock %}

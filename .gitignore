@@ -1,0 +1,5 @@
+/target
+public/styles.css
+**/.DS_Store
+.env
+/s3data

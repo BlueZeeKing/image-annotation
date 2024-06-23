@@ -1,0 +1,9 @@
+{% import "macros.html" as macros %}
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="p-2">
+        <p>No more images!</p>
+        {% call macros::link("Upload Images", "/upload") %}
+    </div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% macro button(child, id) %}
+
+<button id={{id}} class="bg-blue-500 disabled:bg-gray-500 disabled:cursor-not-allowed rounded px-6 p-2 text-white shadow enabled:hover:bg-blue-400 enabled:active:scale-95 enabled:active:shadow-sm transition duration-100 text-md">{{child}}</button>
+
+{% endmacro %}
+
+{% macro link(child, href) %}
+
+<a href={{href}} class="text-blue-600 hover:text-blue-500 active:text-cyan-500 underline">{{child}}</a>
+
+{% endmacro %}
+

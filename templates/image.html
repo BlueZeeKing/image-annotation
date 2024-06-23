@@ -1,0 +1,27 @@
+{% import "macros.html" as macros %}
+{% extends "base.html" %}
+
+{% block head %}
+<script>
+    window.image_id = {{id}};
+</script>
+{% endblock %}
+
+{% block body %}
+<div class="h-full w-full flex flex-col">
+    <div class="flex-grow" id="container">
+        <img class="absolute z-0" id="image" src="{{url}}">
+    </div>
+    <div class="flex gap-6 p-3">
+        <div class="flex-grow"></div>
+        {% call macros::button("Submit", "submit") %}
+        <div class="m-auto">{% call macros::link("Upload Images", "/upload") %}</div>
+        <div class="m-auto">{% call macros::link("Help", "/help") %}</div>
+        <div class="flex-grow"></div>
+    </div>
+</div>
+<div class="absolute border-white top-0 left-0 border-2 relative bottom-0 right-0 -translate-x-1/2 translate-x-1/2 translate-y-1/2 -translate-y-1/2 relative w-4 h-4 rounded-full translate-x-1/2 translate-y-1/2 top-0 left-0 bg-gray-900 bg-red-500 hidden z-10"></div>
+
+<script src="public/image.js"></script>
+{% endblock %}
+
