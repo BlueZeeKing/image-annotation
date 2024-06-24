@@ -58,7 +58,7 @@ let submit = () => {
 		});
 };
 
-submitButton.addEventListener("click", (_) => submit);
+submitButton.addEventListener("click", (_) => submit());
 window.addEventListener("keypress", (e) => {
 	if (e.code == "Enter") {
 		submit();
