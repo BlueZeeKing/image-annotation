@@ -31,7 +31,7 @@ setSize();
 imageNode.addEventListener("load", setSize);
 window.addEventListener("resize", setSize);
 
-submitButton.addEventListener("click", (_) => {
+let submit = () => {
 	let scaleFactor = imageNode.naturalWidth / imageNode.clientWidth;
 
 	let newAnnotations = annotations
@@ -56,6 +56,13 @@ submitButton.addEventListener("click", (_) => {
 		.catch(() => {
 			console.error("Couldn't add annotations");
 		});
+};
+
+submitButton.addEventListener("click", (_) => submit);
+window.addEventListener("keypress", (e) => {
+	if (e.code == "Enter") {
+		submit();
+	}
 });
 
 /**
