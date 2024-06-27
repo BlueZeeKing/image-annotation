@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use anyhow::anyhow;
 use aws_config::BehaviorVersion;
 use aws_sdk_s3::{primitives::ByteStream, Client as S3Client};
@@ -8,7 +10,7 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use libsql::{Builder, Connection as DbConnection};
+use libsql::{Builder, Connection as DbConnection, Database};
 use multer::parse_boundary;
 use serde::Deserialize;
 use tracing::{error, warn};
@@ -19,13 +21,13 @@ const BUCKET: &str = "image-annotation";
 
 #[derive(Clone)]
 pub struct ImageState {
-    database: DbConnection,
+    database: Arc<Database>,
     s3: S3Client,
 }
 
 impl ImageState {
-    pub fn database(&self) -> DbConnection {
-        self.database.clone()
+    pub fn database(&self) -> libsql::Result<DbConnection> {
+        self.database.connect()
     }
 
     pub fn s3(&self) -> S3Client {
@@ -53,7 +55,7 @@ impl ImageState {
 
         Ok(Self {
             s3: client,
-            database: connection,
+            database: Arc::new(db),
         })
     }
 }
@@ -107,7 +109,14 @@ pub async fn upload_file(State(state): State<ImageState>, req: Request) -> Respo
             return StatusCode::BAD_REQUEST.into_response();
         };
 
-        let database = state.database();
+        let database = match state.database.connect() {
+            Ok(connection) => connection,
+            Err(err) => {
+                warn!(?err, "Couldn't connect to db");
+
+                return StatusCode::INTERNAL_SERVER_ERROR.into_response();
+            }
+        };
         let s3 = state.s3();
 
         tokio::spawn(async move {
@@ -161,7 +170,7 @@ pub async fn upload_file(State(state): State<ImageState>, req: Request) -> Respo
 pub async fn get_random_image(State(state): State<ImageState>) -> Response {
     let id: anyhow::Result<_> = try {
         let mut rows = state
-            .database
+            .database.connect()?
             .query("select id from images where not exists (select * from annotations where image = images.id) order by random() limit 1;", ())
             .await?;
 
@@ -264,7 +273,16 @@ pub async fn add_annotations(
     ));
     statements.push_str("commit transaction;");
 
-    match state.database.execute_batch(&statements).await {
+    let connection = match state.database.connect() {
+        Ok(connection) => connection,
+        Err(err) => {
+            error!(?err, "Failed to connect to db");
+
+            return StatusCode::INTERNAL_SERVER_ERROR;
+        }
+    };
+
+    match connection.execute_batch(&statements).await {
         Ok(()) => StatusCode::OK,
         Err(err) => {
             error!(?err, "couldn't upload annotations");
