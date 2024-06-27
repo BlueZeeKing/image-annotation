@@ -11,4 +11,11 @@ create table if not exists annotations (
     y2 integer not null
 );
 
+create table if not exists dimensions (
+    id integer primary key autoincrement,
+    image integer not null references images(id),
+    width integer not null,
+    height integer not null
+);
+
 end;

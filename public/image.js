@@ -48,7 +48,11 @@ let submit = () => {
 		headers: {
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify(newAnnotations),
+		body: JSON.stringify({
+			annotations: newAnnotations,
+			width: imageNode.naturalWidth,
+			height: imageNode.naturalHeight,
+		}),
 	})
 		.then(() => {
 			window.location.replace(window.location.origin);

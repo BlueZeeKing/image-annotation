@@ -236,21 +236,32 @@ pub struct Annotation {
     y2: f64,
 }
 
+#[derive(Deserialize)]
+pub struct AnnotationGroup {
+    annotations: Vec<Annotation>,
+    width: u64,
+    height: u64,
+}
+
 pub async fn add_annotations(
     State(state): State<ImageState>,
     Path(id): Path<ImageId>,
-    Json(annotations): Json<Vec<Annotation>>,
+    Json(annotations): Json<AnnotationGroup>,
 ) -> impl IntoResponse {
     let mut statements = format!(
         "begin transaction;delete from annotations where image = {};",
         id.id
     );
-    for annotation in annotations {
+    for annotation in annotations.annotations {
         statements.push_str(&format!(
             "insert into annotations (image, x1, y1, x2, y2) values ({}, {}, {}, {}, {});",
             id.id, annotation.x1, annotation.y1, annotation.x2, annotation.y2
         ));
     }
+    statements.push_str(&format!(
+        "insert into dimensions (image, width, height) values ({}, {}, {});",
+        id.id, annotations.width, annotations.height
+    ));
     statements.push_str("commit transaction;");
 
     match state.database.execute_batch(&statements).await {
